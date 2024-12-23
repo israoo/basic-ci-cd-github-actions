@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     permissions:
-      id-token: write
+      id-token: write # Permite que el paso de upload-pages-artifact se autentique automáticamente en GitHub.
 
     steps:
       - name: Checkout
@@ -32,18 +32,21 @@ jobs:
       - name: Upload static files as artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          name: github-pages # Nombre del artefacto que se creará.
           path: ./dist
 
   deploy:
     runs-on: ubuntu-24.04
-    needs: build
+    needs: build # El job "deploy" se ejecuta solo después de que "build" haya finalizado correctamente.
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: github-pages # Define un entorno para gestionar configuraciones específicas.
+      url: ${{ steps.deployment.outputs.page_url }} # La URL generada automáticamente por GitHub Pages después del despliegue.
     permissions:
-      id-token: write
-      pages: write
+      id-token: write # Permite que el paso de deploy-pages se autentique automáticamente en GitHub.
+      pages: write # Permite que el paso de deploy-pages pueda publicar en GitHub Pages.
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages # Nombre del artefacto que se utilizará.
